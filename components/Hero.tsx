@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useTransform, animate } from "framer-motion";
+import { useEffect, useRef } from "react";
 import Particles from "./ui/Particles";
 
 const FADE_UP = {
@@ -22,12 +23,30 @@ const AVATARS = [
 
 const LOGOS = ["Google", "Stripe", "Notion", "Linear", "Figma", "Vercel"];
 
+// Animated counter hook
+function useAnimatedCounter(target: number, duration = 1.4, delay = 0.6) {
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (v) => Math.round(v));
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      const controls = animate(count, target, { duration, ease: "easeOut" });
+      return controls.stop;
+    }, delay * 1000);
+    return () => clearTimeout(timeout);
+  }, [target, duration, delay, count]);
+  return rounded;
+}
+
 export default function Hero() {
+  const atsScore = useAnimatedCounter(88, 1.4, 0.8);
+  const atsDelta = useAnimatedCounter(23, 1.0, 1.0);
+
   return (
     <section
       className="relative overflow-hidden min-h-screen"
       style={{ background: "#09090b", fontFamily: "'Instrument Sans', 'Helvetica Neue', sans-serif" }}
     >
+      {/* Particles */}
       <div className="absolute inset-0">
         <Particles
           particleColors={["#a855f7"]}
@@ -43,13 +62,24 @@ export default function Hero() {
         />
       </div>
 
-      {/* Subtle grid texture */}
+      {/* Grid texture */}
       <div
         className="pointer-events-none absolute inset-0"
         style={{
           backgroundImage:
             "linear-gradient(rgba(124,58,237,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(124,58,237,0.03) 1px, transparent 1px)",
           backgroundSize: "40px 40px",
+        }}
+      />
+
+      {/* Radial glow behind resume card — adds depth and focal point */}
+      <div
+        className="pointer-events-none absolute right-0 top-0 hidden md:block"
+        style={{
+          width: "600px",
+          height: "600px",
+          background: "radial-gradient(ellipse at 70% 30%, rgba(124,58,237,0.12) 0%, transparent 65%)",
+          transform: "translate(10%, -10%)",
         }}
       />
 
@@ -100,7 +130,7 @@ export default function Hero() {
             get real-time feedback, and tailor it to every job — all in one place.
           </motion.p>
 
-          {/* CTAs */}
+          {/* CTAs — added scale micro-interaction */}
           <motion.div
             custom={3}
             variants={FADE_UP}
@@ -110,10 +140,18 @@ export default function Hero() {
           >
             <Link
               href="/register"
-              className="inline-flex items-center gap-2 rounded-[7px] px-5 py-2.5 text-[13px] font-semibold text-white transition-colors duration-150"
+              className="inline-flex items-center gap-2 rounded-[7px] px-5 py-2.5 text-[13px] font-semibold text-white transition-all duration-150 active:scale-[0.97]"
               style={{ background: "#7c3aed", letterSpacing: "0.01em" }}
-              onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "#6d28d9")}
-              onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "#7c3aed")}
+              onMouseEnter={(e) => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.background = "#6d28d9";
+                el.style.transform = "translateY(-1px)";
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.background = "#7c3aed";
+                el.style.transform = "translateY(0)";
+              }}
             >
               <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
                 <path d="M6.5 1v11M1 6.5h11" stroke="white" strokeWidth="1.6" strokeLinecap="round" />
@@ -134,11 +172,13 @@ export default function Hero() {
                 const el = e.currentTarget as HTMLElement;
                 el.style.color = "#fff";
                 el.style.borderColor = "rgba(255,255,255,0.22)";
+                el.style.transform = "translateY(-1px)";
               }}
               onMouseLeave={(e) => {
                 const el = e.currentTarget as HTMLElement;
                 el.style.color = "rgba(255,255,255,0.5)";
                 el.style.borderColor = "rgba(255,255,255,0.1)";
+                el.style.transform = "translateY(0)";
               }}
             >
               <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
@@ -198,29 +238,51 @@ export default function Hero() {
           animate="show"
           className="relative flex justify-end"
         >
-          {/* ATS score chip */}
-          <div
+          {/* ATS score chip — now with animated counter */}
+          <motion.div
+            initial={{ opacity: 0, x: 12, y: -8 }}
+            animate={{ opacity: 1, x: 0, y: 0 }}
+            transition={{ delay: 0.7, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="absolute left-[-24px] top-[16px] z-10 rounded-[8px] px-3.5 py-2.5"
             style={{
               background: "#141416",
               border: "1px solid rgba(255,255,255,0.1)",
               minWidth: "130px",
+              boxShadow: "0 0 0 1px rgba(124,58,237,0.1), 0 8px 24px rgba(0,0,0,0.4)",
             }}
           >
             <p className="mb-0.5 text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>ATS score</p>
             <p className="text-[22px] font-semibold leading-none tracking-tight text-white">
-              88<span className="text-[13px] font-normal" style={{ color: "rgba(255,255,255,0.3)" }}>/100</span>
+              <motion.span>{atsScore}</motion.span>
+              <span className="text-[13px] font-normal" style={{ color: "rgba(255,255,255,0.3)" }}>/100</span>
             </p>
-            <p className="mt-0.5 text-[10px] font-medium" style={{ color: "#34d399" }}>↑ 23 pts from last version</p>
+            <p className="mt-0.5 text-[10px] font-medium" style={{ color: "#34d399" }}>
+              ↑ <motion.span>{atsDelta}</motion.span> pts from last version
+            </p>
             <div className="mt-1.5 h-[3px] w-full rounded-full" style={{ background: "rgba(255,255,255,0.07)" }}>
-              <div className="h-full rounded-full" style={{ width: "88%", background: "#7c3aed" }} />
+              {/* Animated bar fill */}
+              <motion.div
+                className="h-full rounded-full"
+                style={{ background: "#7c3aed" }}
+                initial={{ width: "0%" }}
+                animate={{ width: "88%" }}
+                transition={{ delay: 0.9, duration: 1.2, ease: "easeOut" }}
+              />
             </div>
-          </div>
+          </motion.div>
 
-          {/* Resume card */}
-          <div
+          {/* Resume card — slight tilt-in entrance */}
+          <motion.div
+            initial={{ opacity: 0, rotateZ: 2, y: 16 }}
+            animate={{ opacity: 1, rotateZ: 0, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             className="w-full max-w-[300px] overflow-hidden rounded-[10px]"
-            style={{ background: "#141416", border: "1px solid rgba(255,255,255,0.08)" }}
+            style={{
+              background: "#141416",
+              border: "1px solid rgba(255,255,255,0.08)",
+              boxShadow: "0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(124,58,237,0.06)",
+              transformOrigin: "bottom center",
+            }}
           >
             {/* Header */}
             <div
@@ -253,14 +315,20 @@ export default function Hero() {
                 {[
                   { title: "Lead Product Designer — Stripe", meta: "Jan 2022 – Present", bars: [92, 76, 84] },
                   { title: "Product Designer — Notion", meta: "Mar 2019 – Dec 2021", bars: [80, 65] },
-                ].map((exp) => (
+                ].map((exp, expIdx) => (
                   <div key={exp.title} className="mb-2">
                     <p className="text-[11px] font-semibold" style={{ color: "rgba(255,255,255,0.8)" }}>{exp.title}</p>
                     <p className="mb-1 text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>{exp.meta}</p>
                     <div className="flex flex-col gap-[3px]">
                       {exp.bars.map((w, i) => (
                         <div key={i} className="h-[3px] w-full rounded-full" style={{ background: "rgba(255,255,255,0.06)" }}>
-                          <div className="h-full rounded-full" style={{ width: `${w}%`, background: "#7c3aed", opacity: 1 - i * 0.22 }} />
+                          <motion.div
+                            className="h-full rounded-full"
+                            style={{ background: "#7c3aed", opacity: 1 - i * 0.22 }}
+                            initial={{ width: "0%" }}
+                            animate={{ width: `${w}%` }}
+                            transition={{ delay: 0.5 + expIdx * 0.15 + i * 0.08, duration: 0.9, ease: "easeOut" }}
+                          />
                         </div>
                       ))}
                     </div>
@@ -275,24 +343,34 @@ export default function Hero() {
                   <div className="h-px flex-1" style={{ background: "rgba(124,58,237,0.2)" }} />
                 </div>
                 <div className="flex flex-wrap gap-1">
-                  {["Figma", "Design systems", "User research", "Prototyping", "Motion", "SQL"].map((s) => (
-                    <span
+                  {["Figma", "Design systems", "User research", "Prototyping", "Motion", "SQL"].map((s, i) => (
+                    <motion.span
                       key={s}
+                      initial={{ opacity: 0, scale: 0.85 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.8 + i * 0.05, duration: 0.3, ease: "easeOut" }}
                       className="rounded-[4px] px-2 py-[2px] text-[10px] font-medium"
                       style={{ color: "rgba(255,255,255,0.45)", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)" }}
                     >
                       {s}
-                    </span>
+                    </motion.span>
                   ))}
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Keyword match chip */}
-          <div
+          {/* Keyword match chip — slides in from bottom-left */}
+          <motion.div
+            initial={{ opacity: 0, x: -12, y: 8 }}
+            animate={{ opacity: 1, x: 0, y: 0 }}
+            transition={{ delay: 0.9, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="absolute bottom-[20px] left-[-32px] z-10 flex items-center gap-2 rounded-[8px] px-3.5 py-2.5"
-            style={{ background: "#141416", border: "1px solid rgba(255,255,255,0.08)" }}
+            style={{
+              background: "#141416",
+              border: "1px solid rgba(255,255,255,0.08)",
+              boxShadow: "0 0 0 1px rgba(124,58,237,0.08), 0 8px 24px rgba(0,0,0,0.4)",
+            }}
           >
             <div
               className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-[6px]"
@@ -307,25 +385,50 @@ export default function Hero() {
               <p className="text-[12px] font-semibold" style={{ color: "rgba(255,255,255,0.8)" }}>Tailored to job listing</p>
               <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>Keywords matched automatically</p>
             </div>
-          </div>
+          </motion.div>
         </motion.div>
       </div>
 
-      {/* ── Logo strip ── */}
+      {/* ── Logo strip — marquee animation ── */}
       <div
-        className="relative z-10 flex items-center gap-7 px-6 py-4 md:px-10"
+        className="relative z-10 overflow-hidden px-0 py-4"
         style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
       >
-        <span className="shrink-0 text-[11px]" style={{ color: "rgba(255,255,255,0.2)", letterSpacing: "0.02em" }}>
-          Trusted by people hired at
-        </span>
-        <div className="flex flex-wrap items-center gap-6">
-          {LOGOS.map((name) => (
-            <span key={name} className="text-[12px] font-semibold tracking-[-0.01em]" style={{ color: "rgba(255,255,255,0.2)" }}>
+        {/* Fade edges */}
+        <div
+          className="pointer-events-none absolute left-0 top-0 z-10 h-full w-16"
+          style={{ background: "linear-gradient(to right, #09090b, transparent)" }}
+        />
+        <div
+          className="pointer-events-none absolute right-0 top-0 z-10 h-full w-16"
+          style={{ background: "linear-gradient(to left, #09090b, transparent)" }}
+        />
+
+        <div
+          className="flex items-center gap-7"
+          style={{
+            animation: "marquee 22s linear infinite",
+            width: "max-content",
+          }}
+        >
+          {/* Duplicate logos for seamless loop */}
+          {[...LOGOS, ...LOGOS].map((name, i) => (
+            <span
+              key={i}
+              className="shrink-0 text-[12px] font-semibold tracking-[-0.01em]"
+              style={{ color: "rgba(255,255,255,0.2)" }}
+            >
               {name}
             </span>
           ))}
         </div>
+
+        <style>{`
+          @keyframes marquee {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+          }
+        `}</style>
       </div>
     </section>
   );

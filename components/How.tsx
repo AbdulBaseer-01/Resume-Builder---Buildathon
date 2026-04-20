@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { useRef, useState } from "react";
+import { motion, useInView, useMotionValue, useTransform, animate } from "framer-motion";
+import { useEffect } from "react";
 
 const FADE_UP = {
   hidden: { opacity: 0, y: 20 },
@@ -57,11 +58,11 @@ const STEPS = [
 ];
 
 const ATS_BARS = [
-  { label: "Keywords", score: 91, opacity: 1 },
-  { label: "Formatting", score: 88, opacity: 0.75 },
-  { label: "Readability", score: 95, opacity: 0.6 },
-  { label: "Experience", score: 78, opacity: 0.45 },
-  { label: "Skills match", score: 84, opacity: 0.35 },
+  { label: "Keywords",    score: 91, color: "#a78bfa" },
+  { label: "Formatting",  score: 88, color: "#a78bfa" },
+  { label: "Readability", score: 95, color: "#a78bfa" },
+  { label: "Experience",  score: 78, color: "#a78bfa" },
+  { label: "Skills match",score: 84, color: "#a78bfa" },
 ];
 
 const EXPORTS = [
@@ -101,6 +102,33 @@ const EXPORTS = [
   },
 ];
 
+// Animated counter that triggers when inView
+function AnimatedScore({ target, inView }: { target: number; inView: boolean }) {
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (v) => Math.round(v));
+  useEffect(() => {
+    if (!inView) return;
+    const controls = animate(count, target, { duration: 1.2, delay: 0.3, ease: "easeOut" });
+    return controls.stop;
+  }, [inView, target, count]);
+  return <motion.span>{rounded}</motion.span>;
+}
+
+// Animated bar that fills on inView
+function AnimatedBar({ score, inView, delay }: { score: number; inView: boolean; delay: number }) {
+  return (
+    <div className="h-[3px] flex-1 rounded-full" style={{ background: "rgba(255,255,255,0.06)" }}>
+      <motion.div
+        className="h-full rounded-full"
+        style={{ background: "#7c3aed" }}
+        initial={{ width: "0%" }}
+        animate={inView ? { width: `${score}%` } : { width: "0%" }}
+        transition={{ duration: 0.9, delay, ease: "easeOut" }}
+      />
+    </div>
+  );
+}
+
 function PreviewCard({ title, children, delay }: { title: string; children: React.ReactNode; delay: number }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
@@ -110,22 +138,83 @@ function PreviewCard({ title, children, delay }: { title: string; children: Reac
       initial={{ opacity: 0, y: 16 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -3, transition: { duration: 0.2, ease: "easeOut" } }}
       className="overflow-hidden rounded-[10px]"
-      style={{ background: "#111113", border: "1px solid rgba(255,255,255,0.07)" }}
+      style={{
+        background: "#111113",
+        border: "1px solid rgba(255,255,255,0.07)",
+        boxShadow: "0 0 0 0 transparent",
+        transition: "box-shadow 0.2s ease",
+      }}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLElement).style.boxShadow = "0 12px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(124,58,237,0.12)";
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLElement).style.boxShadow = "0 0 0 0 transparent";
+      }}
     >
       <div
         className="flex items-center gap-2 px-4 py-3"
         style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}
       >
         <span className="h-1.5 w-1.5 rounded-full" style={{ background: "#7c3aed" }} />
-        <span
-          className="text-[11px] font-semibold uppercase tracking-[0.03em]"
-          style={{ color: "rgba(255,255,255,0.5)" }}
-        >
+        <span className="text-[11px] font-semibold uppercase tracking-[0.03em]" style={{ color: "rgba(255,255,255,0.5)" }}>
           {title}
         </span>
       </div>
       <div className="p-4">{children}</div>
+    </motion.div>
+  );
+}
+
+// Wrapper so ATS bars card can access its own inView
+function ATSCard({ delay }: { delay: number }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 16 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -3, transition: { duration: 0.2, ease: "easeOut" } }}
+      className="overflow-hidden rounded-[10px]"
+      style={{ background: "#111113", border: "1px solid rgba(255,255,255,0.07)" }}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLElement).style.boxShadow = "0 12px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(124,58,237,0.12)";
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLElement).style.boxShadow = "none";
+      }}
+    >
+      <div className="flex items-center gap-2 px-4 py-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+        <span className="h-1.5 w-1.5 rounded-full" style={{ background: "#7c3aed" }} />
+        <span className="text-[11px] font-semibold uppercase tracking-[0.03em]" style={{ color: "rgba(255,255,255,0.5)" }}>
+          ATS score breakdown
+        </span>
+      </div>
+      <div className="p-4">
+        <div className="flex flex-col gap-1.5">
+          {ATS_BARS.map((item, i) => (
+            <div key={item.label} className="flex items-center gap-2">
+              <span className="w-20 flex-shrink-0 text-[10px]" style={{ color: "rgba(255,255,255,0.35)" }}>
+                {item.label}
+              </span>
+              <AnimatedBar score={item.score} inView={inView} delay={0.2 + i * 0.07} />
+              <span className="w-7 text-right text-[10px] font-semibold" style={{ color: "rgba(255,255,255,0.6)" }}>
+                {item.score}
+              </span>
+            </div>
+          ))}
+        </div>
+        <div className="mt-3 flex items-baseline gap-1.5 border-t pt-2.5" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
+          <span className="text-[20px] font-bold text-white">
+            <AnimatedScore target={87} inView={inView} />
+          </span>
+          <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.3)" }}>/ 100 overall</span>
+          <span className="ml-auto text-[10px] font-semibold" style={{ color: "#34d399" }}>↑ Good</span>
+        </div>
+      </div>
     </motion.div>
   );
 }
@@ -141,6 +230,7 @@ function ChevronRight() {
 export default function How() {
   const sectionRef = useRef(null);
   const inView = useInView(sectionRef, { once: true, margin: "-80px" });
+  const [hoveredExport, setHoveredExport] = useState<string | null>(null);
 
   return (
     <section
@@ -149,6 +239,16 @@ export default function How() {
       style={{ background: "#09090b", fontFamily: "'Instrument Sans', 'Helvetica Neue', sans-serif" }}
       id="how"
     >
+      {/* Subtle radial glow at section center */}
+      <div
+        className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2"
+        style={{
+          width: "700px",
+          height: "400px",
+          background: "radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.07) 0%, transparent 65%)",
+        }}
+      />
+
       {/* ── Section header ── */}
       <div className="mx-auto max-w-6xl px-6 pb-16 pt-24 md:px-10 md:pt-28">
         <motion.div
@@ -159,10 +259,7 @@ export default function How() {
         >
           <div className="mb-4 flex items-center justify-center gap-2">
             <span className="h-px w-6" style={{ background: "#7c3aed", opacity: 0.5 }} />
-            <span
-              className="text-[11px] font-semibold uppercase tracking-[0.07em]"
-              style={{ color: "#a78bfa" }}
-            >
+            <span className="text-[11px] font-semibold uppercase tracking-[0.07em]" style={{ color: "#a78bfa" }}>
               How it works
             </span>
             <span className="h-px w-6" style={{ background: "#7c3aed", opacity: 0.5 }} />
@@ -175,27 +272,33 @@ export default function How() {
             <em className="not-italic" style={{ color: "#a78bfa" }}>interview invite</em>
             {" "}in minutes.
           </h2>
-          <p
-            className="mx-auto max-w-[360px] text-[14px] leading-[1.65]"
-            style={{ color: "rgba(255,255,255,0.38)" }}
-          >
+          <p className="mx-auto max-w-[360px] text-[14px] leading-[1.65]" style={{ color: "rgba(255,255,255,0.38)" }}>
             Four simple steps — no design skills needed, no templates that look like everyone else's.
           </p>
         </motion.div>
 
         {/* ── Steps ── */}
         <div className="relative">
-          {/* Dashed connector line */}
+          {/* Connector line — draws in from left to right on scroll */}
+          {/* top: 48px = step number height (~20px) + half icon height (56/2=28px) */}
           <div
             className="pointer-events-none absolute hidden md:block"
-            style={{
-              top: 28,
-              left: "calc(12.5% + 16px)",
-              right: "calc(12.5% + 16px)",
-              height: 1,
-              borderTop: "1px dashed rgba(124,58,237,0.25)",
-            }}
-          />
+            style={{ top: 48, left: "calc(12.5% + 28px)", right: "calc(12.5% + 28px)", height: 1 }}
+          >
+            {/* Static dashed base */}
+            <div
+              className="absolute inset-0"
+              style={{ borderTop: "1px dashed rgba(124,58,237,0.12)" }}
+            />
+            {/* Animated fill overlay */}
+            <motion.div
+              className="absolute inset-y-0 left-0"
+              style={{ borderTop: "1px dashed rgba(124,58,237,0.45)" }}
+              initial={{ width: "0%" }}
+              animate={inView ? { width: "100%" } : { width: "0%" }}
+              transition={{ duration: 1.2, delay: 0.3, ease: "easeInOut" }}
+            />
+          </div>
 
           <div className="grid grid-cols-2 gap-8 md:grid-cols-4 md:gap-0">
             {STEPS.map((step, i) => (
@@ -207,22 +310,41 @@ export default function How() {
                 animate={inView ? "show" : "hidden"}
                 className="flex flex-col items-center px-4 text-center"
               >
-                {/* Icon box */}
-                <div
-                  className="relative z-10 mb-5 flex h-14 w-14 items-center justify-center rounded-[14px]"
-                  style={{
-                    background: step.active ? "rgba(124,58,237,0.12)" : "#111113",
-                    border: step.active
-                      ? "1px solid rgba(124,58,237,0.3)"
-                      : "1px solid rgba(255,255,255,0.07)",
-                  }}
+                {/* Step number */}
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={inView ? { opacity: 1 } : {}}
+                  transition={{ delay: 0.15 + i * 0.1, duration: 0.4 }}
+                  className="mb-2 text-[10px] font-bold tracking-[0.1em]"
+                  style={{ color: "rgba(124,58,237,0.5)", fontVariantNumeric: "tabular-nums" }}
                 >
-                  {step.icon}
+                  0{i + 1}
+                </motion.span>
+
+                {/* Icon box — active step gets a pulse ring */}
+                <div className="relative z-10 mb-5">
+                  {step.active && (
+                    <motion.div
+                      className="absolute inset-0 rounded-[14px]"
+                      style={{ border: "1px solid rgba(124,58,237,0.4)" }}
+                      animate={{ scale: [1, 1.18, 1], opacity: [0.6, 0, 0.6] }}
+                      transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                  )}
+                  <div
+                    className="flex h-14 w-14 items-center justify-center rounded-[14px]"
+                    style={{
+                      background: step.active ? "rgba(124,58,237,0.12)" : "#111113",
+                      border: step.active
+                        ? "1px solid rgba(124,58,237,0.3)"
+                        : "1px solid rgba(255,255,255,0.07)",
+                    }}
+                  >
+                    {step.icon}
+                  </div>
                 </div>
 
-                <p
-                  className="mb-1.5 text-[13px] font-semibold leading-snug tracking-[-0.01em] text-white"
-                >
+                <p className="mb-1.5 text-[13px] font-semibold leading-snug tracking-[-0.01em] text-white">
                   {step.title}
                 </p>
                 <p className="text-[12px] leading-[1.6]" style={{ color: "rgba(255,255,255,0.35)" }}>
@@ -240,8 +362,8 @@ export default function How() {
           <PreviewCard title="Template picker" delay={0.1}>
             <div className="grid grid-cols-3 gap-2">
               {[
-                { label: "Modern", selected: true, accentHeader: false },
-                { label: "Classic", selected: false, accentHeader: false },
+                { label: "Modern",    selected: true,  accentHeader: false },
+                { label: "Classic",   selected: false, accentHeader: false },
                 { label: "Executive", selected: false, accentHeader: true },
               ].map((t) => (
                 <div
@@ -253,6 +375,7 @@ export default function How() {
                     border: t.selected
                       ? "1px solid rgba(124,58,237,0.5)"
                       : "1px solid rgba(255,255,255,0.07)",
+                    transition: "border-color 0.15s ease",
                   }}
                 >
                   {t.accentHeader && (
@@ -265,9 +388,10 @@ export default function How() {
                         className="h-[2px] rounded-sm"
                         style={{
                           width: `${w}%`,
-                          background: i === 0 && t.selected
-                            ? "rgba(124,58,237,0.4)"
-                            : "rgba(255,255,255,0.1)",
+                          background:
+                            i === 0 && t.selected
+                              ? "rgba(124,58,237,0.4)"
+                              : "rgba(255,255,255,0.1)",
                         }}
                       />
                     ))}
@@ -301,10 +425,7 @@ export default function How() {
             >
               <div className="mb-1.5 flex items-center gap-1">
                 <span className="h-1 w-1 rounded-full" style={{ background: "#7c3aed" }} />
-                <span
-                  className="text-[9px] font-bold uppercase tracking-[0.06em]"
-                  style={{ color: "#a78bfa" }}
-                >
+                <span className="text-[9px] font-bold uppercase tracking-[0.06em]" style={{ color: "#a78bfa" }}>
                   AI suggestion
                 </span>
               </div>
@@ -330,12 +451,20 @@ export default function How() {
               {["Use this", "Try again"].map((label, i) => (
                 <button
                   key={label}
-                  className="flex-1 rounded-[5px] py-1.5 text-[10px] font-semibold"
+                  className="flex-1 rounded-[5px] py-1.5 text-[10px] font-semibold transition-all duration-150"
                   style={
                     i === 0
                       ? { background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.2)", color: "#a78bfa" }
                       : { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.3)" }
                   }
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLElement).style.opacity = "0.75";
+                    (e.currentTarget as HTMLElement).style.transform = "scale(0.98)";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.opacity = "1";
+                    (e.currentTarget as HTMLElement).style.transform = "scale(1)";
+                  }}
                 >
                   {label}
                 </button>
@@ -343,48 +472,8 @@ export default function How() {
             </div>
           </PreviewCard>
 
-          {/* ATS score breakdown */}
-          <PreviewCard title="ATS score breakdown" delay={0.2}>
-            <div className="flex flex-col gap-1.5">
-              {ATS_BARS.map((item) => (
-                <div key={item.label} className="flex items-center gap-2">
-                  <span
-                    className="w-20 flex-shrink-0 text-[10px]"
-                    style={{ color: "rgba(255,255,255,0.35)" }}
-                  >
-                    {item.label}
-                  </span>
-                  <div
-                    className="h-[3px] flex-1 rounded-full"
-                    style={{ background: "rgba(255,255,255,0.06)" }}
-                  >
-                    <div
-                      className="h-full rounded-full"
-                      style={{
-                        width: `${item.score}%`,
-                        background: "#7c3aed",
-                        opacity: item.opacity,
-                      }}
-                    />
-                  </div>
-                  <span
-                    className="w-7 text-right text-[10px] font-semibold"
-                    style={{ color: "rgba(255,255,255,0.6)" }}
-                  >
-                    {item.score}
-                  </span>
-                </div>
-              ))}
-            </div>
-            <div
-              className="mt-3 flex items-baseline gap-1.5 border-t pt-2.5"
-              style={{ borderColor: "rgba(255,255,255,0.05)" }}
-            >
-              <span className="text-[20px] font-bold text-white">87</span>
-              <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.3)" }}>/ 100 overall</span>
-              <span className="ml-auto text-[10px] font-semibold" style={{ color: "#34d399" }}>↑ Good</span>
-            </div>
-          </PreviewCard>
+          {/* ATS score breakdown — has its own inView for animated bars + counter */}
+          <ATSCard delay={0.2} />
 
           {/* Export options */}
           <PreviewCard title="Export options" delay={0.25}>
@@ -392,13 +481,20 @@ export default function How() {
               {EXPORTS.map((exp) => (
                 <div
                   key={exp.label}
-                  className="flex items-center gap-2.5 rounded-[7px] px-3 py-2"
-                  style={{ background: "#1a1a1f", border: "1px solid rgba(255,255,255,0.06)" }}
+                  className="flex cursor-default items-center gap-2.5 rounded-[7px] px-3 py-2 transition-all duration-150"
+                  style={{
+                    background: hoveredExport === exp.label ? "rgba(124,58,237,0.07)" : "#1a1a1f",
+                    border: hoveredExport === exp.label
+                      ? "1px solid rgba(124,58,237,0.22)"
+                      : "1px solid rgba(255,255,255,0.06)",
+                  }}
+                  onMouseEnter={() => setHoveredExport(exp.label)}
+                  onMouseLeave={() => setHoveredExport(null)}
                 >
                   <div
                     className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-[6px]"
                     style={
-                      exp.active
+                      exp.active || hoveredExport === exp.label
                         ? { background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.2)" }
                         : { background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)" }
                     }
@@ -408,7 +504,11 @@ export default function How() {
                   <div>
                     <p
                       className="text-[11px] font-semibold"
-                      style={{ color: exp.active ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.5)" }}
+                      style={{
+                        color: exp.active || hoveredExport === exp.label
+                          ? "rgba(255,255,255,0.85)"
+                          : "rgba(255,255,255,0.5)",
+                      }}
                     >
                       {exp.label}
                     </p>
@@ -438,10 +538,18 @@ export default function How() {
           <div className="h-4 w-px" style={{ background: "rgba(255,255,255,0.08)" }} />
           <a
             href="/register"
-            className="inline-flex items-center gap-2 rounded-[7px] px-5 py-2.5 text-[13px] font-semibold text-white transition-colors duration-150"
+            className="inline-flex items-center gap-2 rounded-[7px] px-5 py-2.5 text-[13px] font-semibold text-white transition-all duration-150"
             style={{ background: "#7c3aed", letterSpacing: "0.01em", textDecoration: "none" }}
-            onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "#6d28d9")}
-            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "#7c3aed")}
+            onMouseEnter={(e) => {
+              const el = e.currentTarget as HTMLElement;
+              el.style.background = "#6d28d9";
+              el.style.transform = "translateY(-1px)";
+            }}
+            onMouseLeave={(e) => {
+              const el = e.currentTarget as HTMLElement;
+              el.style.background = "#7c3aed";
+              el.style.transform = "translateY(0)";
+            }}
           >
             Start building now
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none">

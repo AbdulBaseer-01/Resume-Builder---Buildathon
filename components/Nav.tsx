@@ -5,14 +5,20 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 
-const NAV_LINKS = [
-  { label: "Editor", href: "/" },
-  { label: "How it works?", href: "/#how" },
-  { label: "Pricing", href: "/#pricing" },
+interface NavLink {
+  label: string;
+  href: string;
+  badge?: string;
+}
+
+const NAV_LINKS: NavLink[] = [
+  { label: "Editor",        href: "/"         },
+  { label: "How it works?", href: "/#how"     },
+  { label: "Pricing",       href: "/#pricing" },
 ];
 
 export default function Nav() {
-  const pathname = usePathname();
+  const pathname  = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { scrollY } = useScroll();
@@ -20,8 +26,11 @@ export default function Nav() {
   useMotionValueEvent(scrollY, "change", (v) => setScrolled(v > 12));
 
   return (
-    <div>
-      <div
+    <>
+      {/* Spacer so page content isn't hidden under the fixed bar */}
+      <div className="h-16" aria-hidden="true" />
+
+      <header
         className="fixed inset-x-0 top-0 z-50 flex items-center justify-between h-16 px-6 md:px-8 transition-colors duration-300"
         style={{
           background: "#09090b",
@@ -30,16 +39,17 @@ export default function Nav() {
             : "1px solid rgba(255,255,255,0.04)",
         }}
       >
+        {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 group flex-shrink-0">
           <div
             className="w-[30px] h-[30px] rounded-lg flex items-center justify-center flex-shrink-0"
             style={{ background: "#7c3aed" }}
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <rect x="2" y="2" width="5" height="6" rx="1" fill="white" opacity="0.9" />
-              <rect x="9" y="2" width="5" height="3" rx="1" fill="white" opacity="0.5" />
-              <rect x="2" y="10" width="12" height="1.5" rx=".75" fill="white" opacity="0.5" />
-              <rect x="2" y="13" width="8" height="1.5" rx=".75" fill="white" opacity="0.3" />
+              <rect x="2"  y="2"  width="5"  height="6"   rx="1"   fill="white" opacity="0.9" />
+              <rect x="9"  y="2"  width="5"  height="3"   rx="1"   fill="white" opacity="0.5" />
+              <rect x="2"  y="10" width="12" height="1.5" rx=".75" fill="white" opacity="0.5" />
+              <rect x="2"  y="13" width="8"  height="1.5" rx=".75" fill="white" opacity="0.3" />
             </svg>
           </div>
           <span
@@ -50,7 +60,8 @@ export default function Nav() {
           </span>
         </Link>
 
-        <div className="hidden md:flex items-center gap-0.5 absolute left-1/2 -translate-x-1/2">
+        {/* Desktop centre links */}
+        <nav className="hidden md:flex items-center gap-0.5 absolute left-1/2 -translate-x-1/2">
           {NAV_LINKS.map((link) => {
             const active = pathname === link.href;
             return (
@@ -66,19 +77,18 @@ export default function Nav() {
                 }}
                 onMouseEnter={(e) => {
                   if (!active) {
-                    (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.85)";
+                    (e.currentTarget as HTMLElement).style.color      = "rgba(255,255,255,0.85)";
                     (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.05)";
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!active) {
-                    (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.45)";
+                    (e.currentTarget as HTMLElement).style.color      = "rgba(255,255,255,0.45)";
                     (e.currentTarget as HTMLElement).style.background = "transparent";
                   }
                 }}
               >
                 {link.label}
-                
                 {active && (
                   <motion.span
                     layoutId="navPip"
@@ -90,24 +100,27 @@ export default function Nav() {
               </Link>
             );
           })}
-        </div>
+        </nav>
 
+        {/* Desktop right actions */}
         <div className="hidden md:flex items-center gap-2.5 flex-shrink-0">
           <Link
             href="/dashboard"
-            className="text-[13px] font-medium px-[14px] py-[7px] rounded-md transition-colors duration-150"
+            className="text-[13px] font-medium px-[14px] py-[7px] rounded-md transition-all duration-150"
             style={{
               fontFamily: "'Instrument Sans', sans-serif",
               color: "rgba(255,255,255,0.55)",
               letterSpacing: "0.01em",
             }}
             onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.color = "#fff";
-              (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.06)";
+              const el = e.currentTarget as HTMLElement;
+              el.style.color      = "#fff";
+              el.style.background = "rgba(255,255,255,0.06)";
             }}
             onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.55)";
-              (e.currentTarget as HTMLElement).style.background = "transparent";
+              const el = e.currentTarget as HTMLElement;
+              el.style.color      = "rgba(255,255,255,0.55)";
+              el.style.background = "transparent";
             }}
           >
             Sign in
@@ -117,14 +130,22 @@ export default function Nav() {
 
           <Link
             href="/dashboard/demo"
-            className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-white px-[18px] py-[7px] rounded-md transition-colors duration-150"
+            className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-white px-[18px] py-[7px] rounded-md transition-all duration-150"
             style={{
               fontFamily: "'Instrument Sans', sans-serif",
               background: "#7c3aed",
               letterSpacing: "0.01em",
             }}
-            onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "#6d28d9")}
-            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "#7c3aed")}
+            onMouseEnter={(e) => {
+              const el = e.currentTarget as HTMLElement;
+              el.style.background = "#6d28d9";
+              el.style.transform  = "translateY(-1px)";
+            }}
+            onMouseLeave={(e) => {
+              const el = e.currentTarget as HTMLElement;
+              el.style.background = "#7c3aed";
+              el.style.transform  = "translateY(0)";
+            }}
           >
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
               <path d="M6 1v10M1 6h10" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
@@ -133,6 +154,7 @@ export default function Nav() {
           </Link>
         </div>
 
+        {/* Mobile hamburger */}
         <button
           onClick={() => setMenuOpen((v) => !v)}
           className="md:hidden flex flex-col justify-center items-center w-9 h-9 gap-[5px]"
@@ -144,19 +166,18 @@ export default function Nav() {
               className="block h-[1.5px] bg-white rounded-full origin-center"
               animate={
                 menuOpen
-                  ? i === 0
-                    ? { rotate: 45, y: 6.5, width: 22 }
-                    : i === 2
-                    ? { rotate: -45, y: -6.5, width: 22 }
-                    : { opacity: 0, width: 0 }
+                  ? i === 0 ? { rotate:  45, y:  6.5, width: 22 }
+                  : i === 2 ? { rotate: -45, y: -6.5, width: 22 }
+                  :           { opacity: 0,  width:  0 }
                   : { rotate: 0, y: 0, opacity: 1, width: i === 1 ? 14 : 22 }
               }
               transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
             />
           ))}
         </button>
-      </div>
+      </header>
 
+      {/* Mobile drawer */}
       <AnimatePresence>
         {menuOpen && (
           <>
@@ -198,18 +219,25 @@ export default function Nav() {
                         style={{
                           fontFamily: "'Instrument Sans', sans-serif",
                           color: active ? "#fff" : "rgba(255,255,255,0.45)",
-                          background: active ? "rgba(124,58,237,0.1)" : "transparent",
-                          border: active ? "1px solid rgba(124,58,237,0.2)" : "1px solid transparent",
+                          background: active ? "rgba(124,58,237,0.1)"  : "transparent",
+                          border:     active ? "1px solid rgba(124,58,237,0.2)" : "1px solid transparent",
                         }}
                       >
                         {active && (
-                          <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "#7c3aed" }} />
+                          <span
+                            className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                            style={{ background: "#7c3aed" }}
+                          />
                         )}
                         {link.label}
                         {link.badge && (
                           <span
                             className="ml-auto text-[10px] font-semibold tracking-wider uppercase rounded px-1.5 py-0.5"
-                            style={{ color: "#a78bfa", background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.2)" }}
+                            style={{
+                              color: "#a78bfa",
+                              background: "rgba(124,58,237,0.12)",
+                              border: "1px solid rgba(124,58,237,0.2)",
+                            }}
                           >
                             {link.badge}
                           </span>
@@ -236,8 +264,10 @@ export default function Nav() {
                 <Link
                   href="/register"
                   onClick={() => setMenuOpen(false)}
-                  className="flex items-center justify-center gap-1.5 w-full py-2.5 rounded-md text-[13px] font-semibold text-white transition-colors duration-150"
+                  className="flex items-center justify-center gap-1.5 w-full py-2.5 rounded-md text-[13px] font-semibold text-white transition-all duration-150"
                   style={{ fontFamily: "'Instrument Sans', sans-serif", background: "#7c3aed" }}
+                  onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "#6d28d9")}
+                  onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "#7c3aed")}
                 >
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                     <path d="M6 1v10M1 6h10" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
@@ -249,6 +279,6 @@ export default function Nav() {
           </>
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 }

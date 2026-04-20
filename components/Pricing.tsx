@@ -8,11 +8,7 @@ const FADE_UP = {
   show: (i: number = 0) => ({
     opacity: 1,
     y: 0,
-    transition: {
-      delay: i * 0.08,
-      duration: 0.6,
-      ease: [0.22, 1, 0.36, 1],
-    },
+    transition: { delay: i * 0.08, duration: 0.6, ease: [0.22, 1, 0.36, 1] },
   }),
 };
 
@@ -22,11 +18,7 @@ const CARD_VARIANTS = {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: {
-      delay: 0.1 + i * 0.1,
-      duration: 0.65,
-      ease: [0.22, 1, 0.36, 1],
-    },
+    transition: { delay: 0.1 + i * 0.1, duration: 0.65, ease: [0.22, 1, 0.36, 1] },
   }),
 };
 
@@ -54,13 +46,13 @@ const PLANS: Plan[] = [
     cta: "Get started free",
     ctaStyle: "ghost",
     features: [
-      { text: <><strong className="text-white/75 font-medium">3 resumes</strong></>, included: true },
-      { text: <><strong className="text-white/75 font-medium">8 templates</strong></>, included: true },
-      { text: <>PDF export</>, included: true },
-      { text: <>Basic ATS score</>, included: true },
-      { text: <>AI bullet suggestions</>, included: false },
-      { text: <>Job-match tailoring</>, included: false },
-      { text: <>Live shareable link</>, included: false },
+      { text: <><strong className="text-white/75 font-medium">3 resumes</strong></>,          included: true  },
+      { text: <><strong className="text-white/75 font-medium">8 templates</strong></>,         included: true  },
+      { text: <>PDF export</>,                                                                  included: true  },
+      { text: <>Basic ATS score</>,                                                             included: true  },
+      { text: <>AI bullet suggestions</>,                                                       included: false },
+      { text: <>Job-match tailoring</>,                                                         included: false },
+      { text: <>Live shareable link</>,                                                         included: false },
     ],
   },
   {
@@ -68,22 +60,19 @@ const PLANS: Plan[] = [
     name: "Pro",
     prices: { monthly: "$14", annual: "$9" },
     originalMonthly: "$22",
-    desc: {
-      monthly: "Billed monthly. Cancel any time.",
-      annual: "Billed annually — you save 35%.",
-    },
+    desc: { monthly: "Billed monthly. Cancel any time.", annual: "Billed annually — you save 35%." },
     cta: "Start 7-day free trial",
     ctaStyle: "primary",
     featured: true,
     badge: "Most popular",
     features: [
-      { text: <><strong className="text-white/80 font-medium">Unlimited resumes</strong></>, included: true },
-      { text: <><strong className="text-white/80 font-medium">All 40+ templates</strong></>, included: true },
-      { text: <>PDF + DOCX export</>, included: true },
-      { text: <><strong className="text-white/80 font-medium">AI bullet suggestions</strong> — unlimited</>, included: true },
-      { text: <><strong className="text-white/80 font-medium">Job-match tailoring</strong> + keyword scan</>, included: true },
-      { text: <>Full ATS score breakdown</>, included: true },
-      { text: <>Live shareable link</>, included: true },
+      { text: <><strong className="text-white/80 font-medium">Unlimited resumes</strong></>,                       included: true },
+      { text: <><strong className="text-white/80 font-medium">All 40+ templates</strong></>,                       included: true },
+      { text: <>PDF + DOCX export</>,                                                                               included: true },
+      { text: <><strong className="text-white/80 font-medium">AI bullet suggestions</strong> — unlimited</>,       included: true },
+      { text: <><strong className="text-white/80 font-medium">Job-match tailoring</strong> + keyword scan</>,      included: true },
+      { text: <>Full ATS score breakdown</>,                                                                        included: true },
+      { text: <>Live shareable link</>,                                                                             included: true },
     ],
   },
   {
@@ -91,20 +80,17 @@ const PLANS: Plan[] = [
     name: "Teams",
     prices: { monthly: "$9", annual: "$6" },
     originalMonthly: "$14",
-    desc: {
-      monthly: "Per seat / mo. Min. 3 seats.",
-      annual: "Per seat / mo, billed annually.",
-    },
+    desc: { monthly: "Per seat / mo. Min. 3 seats.", annual: "Per seat / mo, billed annually." },
     cta: "Contact sales",
     ctaStyle: "outline",
     features: [
       { text: <>Everything in <strong className="text-white/75 font-medium">Pro</strong></>, included: true },
-      { text: <>Team admin dashboard</>, included: true },
+      { text: <>Team admin dashboard</>,   included: true },
       { text: <>Shared brand templates</>, included: true },
-      { text: <>Bulk DOCX export</>, included: true },
+      { text: <>Bulk DOCX export</>,       included: true },
       { text: <>Priority support + SLA</>, included: true },
-      { text: <>SSO + audit logs</>, included: true },
-      { text: <>Custom onboarding</>, included: true },
+      { text: <>SSO + audit logs</>,       included: true },
+      { text: <>Custom onboarding</>,      included: true },
     ],
   },
 ];
@@ -127,7 +113,6 @@ const FAQ_ITEMS = [
     a: "Free plan exports include a small footer watermark. Pro and Teams exports are completely clean — no branding of any kind.",
   },
 ];
-
 
 function CheckIcon({ included, featured }: { included: boolean; featured?: boolean }) {
   if (included) {
@@ -158,7 +143,7 @@ function CheckIcon({ included, featured }: { included: boolean; featured?: boole
 
 function FaqItem({ q, a, delay }: { q: string; a: string; delay: number }) {
   const [open, setOpen] = useState(false);
-  const ref = useRef(null);
+  const ref    = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });
 
   return (
@@ -206,10 +191,7 @@ function FaqItem({ q, a, delay }: { q: string; a: string; delay: number }) {
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="overflow-hidden"
           >
-            <p
-              className="pb-4 text-[12px] leading-relaxed"
-              style={{ color: "rgba(255,255,255,0.3)" }}
-            >
+            <p className="pb-4 text-[12px] leading-relaxed" style={{ color: "rgba(255,255,255,0.3)" }}>
               {a}
             </p>
           </motion.div>
@@ -222,57 +204,55 @@ function FaqItem({ q, a, delay }: { q: string; a: string; delay: number }) {
 export default function Pricing() {
   const [billing, setBilling] = useState<BillingCycle>("monthly");
   const sectionRef = useRef(null);
-  const inView = useInView(sectionRef, { once: true, margin: "-80px" });
-  const isAnnual = billing === "annual";
+  const inView     = useInView(sectionRef, { once: true, margin: "-80px" });
+  const isAnnual   = billing === "annual";
 
   return (
     <section
       ref={sectionRef}
       className="relative overflow-hidden"
-      style={{
-        background: "#09090b",
-        fontFamily: "'Instrument Sans', 'Helvetica Neue', sans-serif",
-      }}
+      style={{ background: "#09090b", fontFamily: "'Instrument Sans', 'Helvetica Neue', sans-serif" }}
       id="pricing"
     >
+      {/* Subtle top glow matching other sections */}
+      <div
+        className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2"
+        style={{
+          width: "700px",
+          height: "400px",
+          background: "radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.07) 0%, transparent 65%)",
+        }}
+      />
+
       <div className="mx-auto max-w-6xl px-6 pt-24 pb-24 md:px-10 md:pt-28">
 
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
           className="mb-12 text-center"
         >
-          {/* Label */}
           <div className="mb-4 flex items-center justify-center gap-2">
             <span className="h-px w-6" style={{ background: "#7c3aed", opacity: 0.5 }} />
-            <span
-              className="text-[11px] font-semibold uppercase tracking-[0.07em]"
-              style={{ color: "#a78bfa" }}
-            >
+            <span className="text-[11px] font-semibold uppercase tracking-[0.07em]" style={{ color: "#a78bfa" }}>
               Pricing
             </span>
             <span className="h-px w-6" style={{ background: "#7c3aed", opacity: 0.5 }} />
           </div>
-
           <h2
             className="mb-3.5 text-[32px] font-medium leading-[1.15] tracking-[-0.02em] text-white md:text-[38px]"
             style={{ fontFamily: "'Playfair Display', serif" }}
           >
             One resume. One price.{" "}
-            <em className="not-italic" style={{ color: "#a78bfa" }}>
-              Unlimited interviews.
-            </em>
+            <em className="not-italic" style={{ color: "#a78bfa" }}>Unlimited interviews.</em>
           </h2>
-          <p
-            className="mx-auto max-w-[340px] text-[14px] leading-[1.65]"
-            style={{ color: "rgba(255,255,255,0.38)" }}
-          >
+          <p className="mx-auto max-w-[340px] text-[14px] leading-[1.65]" style={{ color: "rgba(255,255,255,0.38)" }}>
             Start free — upgrade when you're ready. No contracts, cancel any time.
           </p>
         </motion.div>
 
-        {/* ── Billing toggle ── */}
+        {/* Billing toggle — thumb uses Framer `layout` for smooth spring animation */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -291,14 +271,14 @@ export default function Pricing() {
             className="relative h-[22px] w-10 rounded-full transition-colors duration-200 focus:outline-none"
             style={{
               background: isAnnual ? "rgba(124,58,237,0.25)" : "#1e1e23",
-              border: isAnnual
-                ? "1px solid rgba(124,58,237,0.4)"
-                : "1px solid rgba(255,255,255,0.1)",
+              border: isAnnual ? "1px solid rgba(124,58,237,0.4)" : "1px solid rgba(255,255,255,0.1)",
             }}
             aria-label="Toggle billing cycle"
           >
+            {/* Use layoutId so Framer handles the spring movement — no manual left calculation */}
             <motion.span
               layout
+              layoutId="toggleThumb"
               transition={{ type: "spring", stiffness: 500, damping: 35 }}
               className="absolute top-[3px] h-3.5 w-3.5 rounded-full"
               style={{
@@ -323,13 +303,14 @@ export default function Pricing() {
               background: "rgba(124,58,237,0.12)",
               border: "1px solid rgba(124,58,237,0.2)",
               color: "#a78bfa",
-              letterSpacing: "0.03em",
+              letterSpacing: "0.06em",
             }}
           >
             Save 35%
           </motion.span>
         </motion.div>
 
+        {/* Plan cards */}
         <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
           {PLANS.map((plan, i) => (
             <motion.div
@@ -404,13 +385,23 @@ export default function Pricing() {
                 {plan.desc[billing]}
               </p>
 
+              {/* CTA buttons — all get translateY hover lift for consistency */}
               {plan.ctaStyle === "primary" && (
                 <motion.a
                   href="/register"
-                  whileHover={{ background: "#6d28d9" }}
                   whileTap={{ scale: 0.98 }}
-                  className="mb-5 flex items-center justify-center gap-2 rounded-[7px] py-2.5 text-[13px] font-semibold text-white"
+                  className="mb-5 flex items-center justify-center gap-2 rounded-[7px] py-2.5 text-[13px] font-semibold text-white transition-all duration-150"
                   style={{ background: "#7c3aed", textDecoration: "none" }}
+                  onMouseEnter={(e) => {
+                    const el = e.currentTarget as HTMLElement;
+                    el.style.background = "#6d28d9";
+                    el.style.transform  = "translateY(-1px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    const el = e.currentTarget as HTMLElement;
+                    el.style.background = "#7c3aed";
+                    el.style.transform  = "translateY(0)";
+                  }}
                 >
                   {plan.cta}
                   <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
@@ -422,7 +413,7 @@ export default function Pricing() {
                 <motion.a
                   href="/register"
                   whileTap={{ scale: 0.98 }}
-                  className="mb-5 flex items-center justify-center rounded-[7px] py-2.5 text-[13px] font-semibold transition-colors duration-150"
+                  className="mb-5 flex items-center justify-center rounded-[7px] py-2.5 text-[13px] font-semibold transition-all duration-150"
                   style={{
                     background: "rgba(255,255,255,0.04)",
                     border: "1px solid rgba(255,255,255,0.08)",
@@ -430,12 +421,16 @@ export default function Pricing() {
                     textDecoration: "none",
                   }}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.07)";
-                    (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.65)";
+                    const el = e.currentTarget as HTMLElement;
+                    el.style.background = "rgba(255,255,255,0.07)";
+                    el.style.color      = "rgba(255,255,255,0.65)";
+                    el.style.transform  = "translateY(-1px)";
                   }}
                   onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)";
-                    (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.45)";
+                    const el = e.currentTarget as HTMLElement;
+                    el.style.background = "rgba(255,255,255,0.04)";
+                    el.style.color      = "rgba(255,255,255,0.45)";
+                    el.style.transform  = "translateY(0)";
                   }}
                 >
                   {plan.cta}
@@ -445,7 +440,7 @@ export default function Pricing() {
                 <motion.a
                   href="/contact"
                   whileTap={{ scale: 0.98 }}
-                  className="mb-5 flex items-center justify-center rounded-[7px] py-2.5 text-[13px] font-semibold transition-colors duration-150"
+                  className="mb-5 flex items-center justify-center rounded-[7px] py-2.5 text-[13px] font-semibold transition-all duration-150"
                   style={{
                     background: "transparent",
                     border: "1px solid rgba(124,58,237,0.3)",
@@ -453,10 +448,14 @@ export default function Pricing() {
                     textDecoration: "none",
                   }}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.07)";
+                    const el = e.currentTarget as HTMLElement;
+                    el.style.background = "rgba(124,58,237,0.07)";
+                    el.style.transform  = "translateY(-1px)";
                   }}
                   onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.background = "transparent";
+                    const el = e.currentTarget as HTMLElement;
+                    el.style.background = "transparent";
+                    el.style.transform  = "translateY(0)";
                   }}
                 >
                   {plan.cta}
@@ -471,11 +470,7 @@ export default function Pricing() {
                     <CheckIcon included={feat.included} featured={plan.featured} />
                     <span
                       className="text-[12px] leading-[1.55]"
-                      style={{
-                        color: feat.included
-                          ? "rgba(255,255,255,0.5)"
-                          : "rgba(255,255,255,0.2)",
-                      }}
+                      style={{ color: feat.included ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.2)" }}
                     >
                       {feat.text}
                     </span>
@@ -486,6 +481,7 @@ export default function Pricing() {
           ))}
         </div>
 
+        {/* Trust line */}
         <motion.div
           custom={3}
           variants={FADE_UP}
@@ -495,19 +491,15 @@ export default function Pricing() {
         >
           {["7-day free trial", "No credit card required", "Cancel any time"].map((item, i) => (
             <span key={item} className="flex items-center gap-3">
-              <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.22)" }}>
-                {item}
-              </span>
+              <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.22)" }}>{item}</span>
               {i < 2 && (
-                <span
-                  className="h-[3px] w-[3px] rounded-full"
-                  style={{ background: "rgba(255,255,255,0.12)" }}
-                />
+                <span className="h-[3px] w-[3px] rounded-full" style={{ background: "rgba(255,255,255,0.12)" }} />
               )}
             </span>
           ))}
         </motion.div>
 
+        {/* FAQ */}
         <div className="mx-auto mt-16 max-w-[560px]">
           <motion.p
             custom={4}
@@ -519,17 +511,12 @@ export default function Pricing() {
           >
             Common questions
           </motion.p>
-
           {FAQ_ITEMS.map((item, i) => (
-            <FaqItem
-              key={item.q}
-              q={item.q}
-              a={item.a}
-              delay={0.05 * i}
-            />
+            <FaqItem key={item.q} q={item.q} a={item.a} delay={0.05 * i} />
           ))}
         </div>
 
+        {/* Bottom CTA */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -542,10 +529,19 @@ export default function Pricing() {
           <div className="h-4 w-px" style={{ background: "rgba(255,255,255,0.08)" }} />
           <motion.a
             href="/register"
-            whileHover={{ background: "#6d28d9" }}
             whileTap={{ scale: 0.97 }}
-            className="inline-flex items-center gap-2 rounded-[7px] px-5 py-2.5 text-[13px] font-semibold text-white"
+            className="inline-flex items-center gap-2 rounded-[7px] px-5 py-2.5 text-[13px] font-semibold text-white transition-all duration-150"
             style={{ background: "#7c3aed", textDecoration: "none" }}
+            onMouseEnter={(e) => {
+              const el = e.currentTarget as HTMLElement;
+              el.style.background = "#6d28d9";
+              el.style.transform  = "translateY(-1px)";
+            }}
+            onMouseLeave={(e) => {
+              const el = e.currentTarget as HTMLElement;
+              el.style.background = "#7c3aed";
+              el.style.transform  = "translateY(0)";
+            }}
           >
             Start building now
             <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
