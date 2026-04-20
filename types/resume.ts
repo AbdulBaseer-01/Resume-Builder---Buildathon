@@ -1,4 +1,3 @@
-// src/types/resume.ts
 
 export type Template = "modern" | "classic" | "executive";
 
